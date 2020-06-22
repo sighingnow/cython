@@ -250,12 +250,13 @@ class DeclarationWriter(TreeVisitor):
         self.dedent()
 
     def visit_CFuncDefNode(self, node):
-        if 'inline' in node.modifiers:
-            return
         if node.overridable:
             self.startline(u'cpdef ')
         else:
             self.startline(u'cdef ')
+        if node.modifiers:
+            self.put(' '.join(node.modifiers))
+            self.put(' ')
         if node.visibility != 'private':
             self.put(node.visibility)
             self.put(u' ')
@@ -572,13 +573,6 @@ class ExpressionWriter(TreeVisitor):
     def visit_StringNode(self, node):
         self.emit_string(node)
 
-    # def visit_StringNode(self, node):
-    #     value = node.value
-    #     unicode_value = node.unicode_value
-    #     if unicode_value is not None and unicode_value.encoding is not None:
-    #         value = unicode_value.encode(unicode_value.encoding)
-    #     self.put(repr(value))
-
     def visit_UnicodeNode(self, node):
         self.emit_string(node, u"u")
 
@@ -653,9 +647,7 @@ class ExpressionWriter(TreeVisitor):
         prec = self.unop_precedence[op]
         self.operator_enter(prec)
         self.put(u"%s" % node.operator)
-        self.put(u"(")
         self.visit(node.operand)
-        self.put(u")")
         self.operator_exit()
 
     def visit_BinopNode(self, node):
@@ -826,12 +818,13 @@ class PxdWriter(DeclarationWriter, ExpressionWriter):
         return node
 
     def visit_CFuncDefNode(self, node):
-        if 'inline' in node.modifiers:
-            return
         if node.overridable:
             self.startline(u'cpdef ')
         else:
             self.startline(u'cdef ')
+        if node.modifiers:
+            self.put(' '.join(node.modifiers))
+            self.put(' ')
         if node.visibility != 'private':
             self.put(node.visibility)
             self.put(u' ')

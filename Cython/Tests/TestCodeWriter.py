@@ -57,7 +57,7 @@ class TestCodeWriter(CythonTest):
                         pass
                     cdef f(int **x, void **y, Value **z):
                         pass
-                    cdef f(int &x, Value &z):
+                    cdef inline f(int &x, Value &z):
                         pass
                """)
 
